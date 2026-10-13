@@ -1,0 +1,107 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 20, "patch": 0 },
+
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "FWB_WERROR": "ON"
+      }
+    },
+
+    {
+      "name": "debug",
+      "inherits": "base",
+      "displayName": "Debug — tests unitaires, assertions actives",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_FLAGS_DEBUG": "-O0 -g3",
+        "FWB_BUILD_TESTS": "ON"
+      }
+    },
+
+    {
+      "name": "release",
+      "inherits": "base",
+      "displayName": "Release — representatif d'une build embarquee",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "MinSizeRel",
+        "CMAKE_C_FLAGS_MINSIZEREL": "-Os -DNDEBUG",
+        "FWB_BUILD_TESTS": "ON"
+      }
+    },
+
+    {
+      "name": "asan-ubsan",
+      "inherits": "base",
+      "displayName": "Sanitizers — AddressSanitizer et UndefinedBehaviorSanitizer",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_FLAGS_DEBUG": "-O1 -g3",
+        "FWB_BUILD_TESTS": "ON",
+        "FWB_SANITIZERS": "address;undefined"
+      }
+    },
+
+    {
+      "name": "fuzz",
+      "inherits": "base",
+      "displayName": "Fuzzing — libFuzzer, requiert Clang",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_FLAGS_DEBUG": "-O1 -g3",
+        "CMAKE_C_COMPILER": "clang",
+        "FWB_BUILD_TESTS": "ON",
+        "FWB_BUILD_FUZZERS": "ON"
+      }
+    }
+  ],
+
+  "buildPresets": [
+    { "name": "debug",      "configurePreset": "debug" },
+    { "name": "release",    "configurePreset": "release" },
+    { "name": "asan-ubsan", "configurePreset": "asan-ubsan" },
+    { "name": "fuzz",       "configurePreset": "fuzz" },
+
+    {
+      "name": "headers",
+      "configurePreset": "debug",
+      "displayName": "Verification C des en-tetes publics",
+      "targets": ["fwb_header_c_compile"]
+    }
+  ],
+
+  "testPresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "ignore", "stopOnFailure": false }
+    },
+
+    { "name": "debug",      "inherits": "base", "configurePreset": "debug" },
+    { "name": "release",    "inherits": "base", "configurePreset": "release" },
+    { "name": "asan-ubsan", "inherits": "base", "configurePreset": "asan-ubsan" },
+
+    {
+      "name": "spec",
+      "inherits": "base",
+      "configurePreset": "debug",
+      "displayName": "Controles de specification seuls",
+      "filter": { "include": { "label": "spec" } }
+    },
+
+    {
+      "name": "fuzz-corpus",
+      "inherits": "base",
+      "configurePreset": "fuzz",
+      "displayName": "Rejeu du corpus de fuzzing versionne",
+      "filter": { "include": { "label": "fuzz-corpus" } }
+    }
+  ]
+}

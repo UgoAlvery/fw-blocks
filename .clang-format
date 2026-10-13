@@ -1,0 +1,56 @@
+# Style de fw-blocks. Derive de LLVM, ajuste pour du C embarque.
+#
+# Le style n'a pas a etre discute en revue : il est applique mecaniquement et
+# verifie en CI. Toute divergence est une erreur de formatage, pas un avis.
+
+Language: Cpp
+BasedOnStyle: LLVM
+
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+
+# Accolade sur la meme ligne, sauf pour les definitions de fonction : la
+# distinction rend le debut d'une fonction immediatement reperable dans un
+# fichier dense.
+BreakBeforeBraces: Linux
+
+AlignAfterOpenBracket: Align
+AlignConsecutiveMacros: AcrossEmptyLinesAndComments
+AlignEscapedNewlines: Left
+AlignTrailingComments: true
+
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+# Le pointeur se rattache au nom, pas au type : en C, « uint8_t *a, *b »
+# declare bien deux pointeurs, et cette ecriture le montre.
+PointerAlignment: Right
+DerivePointerAlignment: false
+
+IndentCaseLabels: false
+IndentPPDirectives: AfterHash
+SpaceAfterCStyleCast: false
+SpacesBeforeTrailingComments: 2
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+
+# Les en-tetes sont tries par groupes : d'abord l'en-tete correspondant au
+# .c courant, puis la bibliotheque standard, puis les en-tetes du projet.
+SortIncludes: CaseSensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:    '^<(assert|limits|stdbool|stddef|stdint|string)\.h>$'
+    Priority: 2
+  - Regex:    '^<.*\.h>$'
+    Priority: 3
+  - Regex:    '^"fwb/.*"$'
+    Priority: 4
+  - Regex:    '.*'
+    Priority: 5
+
+ReflowComments: true

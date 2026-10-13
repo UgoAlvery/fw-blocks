@@ -1,0 +1,217 @@
+# Vecteurs de reference fw-blocks / framing
+#
+# GENERE par tools/gen_vectors.py — ne pas editer a la main.
+# Regenerer : python3 tools/gen_vectors.py --write
+#
+# DECODED = trame apres decodage COBS (wire-format.md §2).
+# WIRE    = octets sur le fil, delimiteur 0x00 inclus (§6).
+# EXPECT  = code de retour attendu au decodage. Le verifier exactement :
+#           un decodeur qui rejette tout passe un test qui n'exige
+#           qu'un rejet. Voir ADR-0004.
+
+[FRM-V-001]
+title  = Payload vide
+expect = FWB_OK
+note   = TYPE=0x10 SEQ=0 LEN=0 link_id=0x0000
+decoded_len = 9
+decoded =
+    01 00 10 00 00 00 00 49 A4
+wire_len = 11
+wire =
+    02 01 02 10 01 01 01 03 49 A4 00
+
+[FRM-V-002]
+title  = Payload ASCII 'ABC'
+expect = FWB_OK
+note   = TYPE=0x20 SEQ=1 LEN=3 link_id=0x0000 — vecteur de reference du format
+decoded_len = 12
+decoded =
+    01 00 20 01 00 03 00 41 42 43 F3 FF
+wire_len = 14
+wire =
+    02 01 03 20 01 02 03 06 41 42 43 F3 FF 00
+
+[FRM-V-003]
+title  = Payload de trois octets nuls
+expect = FWB_OK
+note   = exerce le decoupage COBS : chaque zero ferme un bloc
+decoded_len = 12
+decoded =
+    01 00 20 02 00 03 00 00 00 00 E5 1E
+wire_len = 14
+wire =
+    02 01 03 20 02 02 03 01 01 01 03 E5 1E 00
+
+[FRM-V-004]
+title  = SEQ a sa valeur maximale
+expect = FWB_OK
+note   = SEQ=0xFFFF, la trame suivante repasse a 0 ; payload = motif binaire de 1.0f
+decoded_len = 13
+decoded =
+    01 00 30 FF FF 04 00 00 00 80 3F FC EF
+wire_len = 15
+wire =
+    02 01 05 30 FF FF 04 01 01 05 80 3F FC EF 00
+
+[FRM-V-005]
+title  = Payload maximal de 256 octets
+expect = FWB_OK
+note   = payload = 0x00..0xFF ; trame la plus longue possible, COBS a plus d'un bloc
+decoded_len = 265
+decoded =
+    01 00 40 03 00 00 01 00 01 02 03 04 05 06 07 08
+    09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17 18
+    19 1A 1B 1C 1D 1E 1F 20 21 22 23 24 25 26 27 28
+    29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37 38
+    39 3A 3B 3C 3D 3E 3F 40 41 42 43 44 45 46 47 48
+    49 4A 4B 4C 4D 4E 4F 50 51 52 53 54 55 56 57 58
+    59 5A 5B 5C 5D 5E 5F 60 61 62 63 64 65 66 67 68
+    69 6A 6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77 78
+    79 7A 7B 7C 7D 7E 7F 80 81 82 83 84 85 86 87 88
+    89 8A 8B 8C 8D 8E 8F 90 91 92 93 94 95 96 97 98
+    99 9A 9B 9C 9D 9E 9F A0 A1 A2 A3 A4 A5 A6 A7 A8
+    A9 AA AB AC AD AE AF B0 B1 B2 B3 B4 B5 B6 B7 B8
+    B9 BA BB BC BD BE BF C0 C1 C2 C3 C4 C5 C6 C7 C8
+    C9 CA CB CC CD CE CF D0 D1 D2 D3 D4 D5 D6 D7 D8
+    D9 DA DB DC DD DE DF E0 E1 E2 E3 E4 E5 E6 E7 E8
+    E9 EA EB EC ED EE EF F0 F1 F2 F3 F4 F5 F6 F7 F8
+    F9 FA FB FC FD FE FF 32 72
+wire_len = 268
+wire =
+    02 01 03 40 03 01 02 01 FF 01 02 03 04 05 06 07
+    08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17
+    18 19 1A 1B 1C 1D 1E 1F 20 21 22 23 24 25 26 27
+    28 29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37
+    38 39 3A 3B 3C 3D 3E 3F 40 41 42 43 44 45 46 47
+    48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54 55 56 57
+    58 59 5A 5B 5C 5D 5E 5F 60 61 62 63 64 65 66 67
+    68 69 6A 6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77
+    78 79 7A 7B 7C 7D 7E 7F 80 81 82 83 84 85 86 87
+    88 89 8A 8B 8C 8D 8E 8F 90 91 92 93 94 95 96 97
+    98 99 9A 9B 9C 9D 9E 9F A0 A1 A2 A3 A4 A5 A6 A7
+    A8 A9 AA AB AC AD AE AF B0 B1 B2 B3 B4 B5 B6 B7
+    B8 B9 BA BB BC BD BE BF C0 C1 C2 C3 C4 C5 C6 C7
+    C8 C9 CA CB CC CD CE CF D0 D1 D2 D3 D4 D5 D6 D7
+    D8 D9 DA DB DC DD DE DF E0 E1 E2 E3 E4 E5 E6 E7
+    E8 E9 EA EB EC ED EE EF F0 F1 F2 F3 F4 F5 F6 F7
+    F8 F9 FA FB FC FD FE 04 FF 32 72 00
+
+[FRM-V-006]
+title  = Meme trame que FRM-V-002 avec link_id=0xBEEF
+expect = FWB_OK
+note   = seul le CRC differe de FRM-V-002 : demontre l'identifiant de lien (ADR-0007)
+decoded_len = 12
+decoded =
+    01 00 20 01 00 03 00 41 42 43 C6 D0
+wire_len = 14
+wire =
+    02 01 03 20 01 02 03 06 41 42 43 C6 D0 00
+
+[FRM-I-001]
+title  = CRC errone
+expect = FWB_ERR_BAD_CRC
+note   = bit 0 du CRC inverse par rapport a FRM-V-002
+decoded_len = 12
+decoded =
+    01 00 20 01 00 03 00 41 42 43 F2 FF
+wire_len = 14
+wire =
+    02 01 03 20 01 02 03 06 41 42 43 F2 FF 00
+
+[FRM-I-002]
+title  = Payload corrompu
+expect = FWB_ERR_BAD_CRC
+note   = bit 7 du premier octet de payload inverse ('B' -> 0xC2)
+decoded_len = 12
+decoded =
+    01 00 20 01 00 03 00 41 C2 43 F3 FF
+wire_len = 14
+wire =
+    02 01 03 20 01 02 03 06 41 C2 43 F3 FF 00
+
+[FRM-I-003]
+title  = LEN incoherent
+expect = FWB_ERR_LENGTH_MISMATCH
+note   = LEN=4 annonce, 3 octets presents ; controle 3 avant le CRC
+decoded_len = 12
+decoded =
+    01 00 20 01 00 04 00 41 42 43 27 98
+wire_len = 14
+wire =
+    02 01 03 20 01 02 04 06 41 42 43 27 98 00
+
+[FRM-I-004]
+title  = Version inconnue
+expect = FWB_ERR_BAD_VERSION
+note   = VER=0x02, CRC volontairement valide : le controle 5 s'applique apres le CRC
+decoded_len = 12
+decoded =
+    02 00 20 01 00 03 00 41 42 43 3C 4E
+wire_len = 14
+wire =
+    02 02 03 20 01 02 03 06 41 42 43 3C 4E 00
+
+[FRM-I-005]
+title  = Drapeau reserve positionne
+expect = FWB_ERR_BAD_FLAGS
+note   = FLAGS=0x01 (bit MAC), CRC volontairement valide
+decoded_len = 12
+decoded =
+    01 01 20 01 00 03 00 41 42 43 D0 14
+wire_len = 14
+wire =
+    05 01 01 20 01 02 03 06 41 42 43 D0 14 00
+
+[FRM-I-006]
+title  = LEN superieur au maximum
+expect = FWB_ERR_PAYLOAD_TOO_LARGE
+note   = LEN=0x0101=257 > 256 ; controle 2, avant le controle de coherence
+decoded_len = 12
+decoded =
+    01 00 20 01 00 01 01 41 42 43 C4 CD
+wire_len = 14
+wire =
+    02 01 03 20 01 08 01 01 41 42 43 C4 CD 00
+
+[FRM-I-007]
+title  = Trame tronquee
+expect = FWB_ERR_FRAME_TOO_SHORT
+note   = 6 octets, minimum structurel 9
+decoded_len = 6
+decoded =
+    01 00 20 01 00 03
+wire_len = 8
+wire =
+    02 01 03 20 01 02 03 00
+
+[FRM-I-008]
+title  = Code COBS hors limites
+expect = FWB_ERR_COBS_MALFORMED
+note   = le code 0x05 designe un bloc depassant la fin de la zone encodee
+wire_len = 4
+wire =
+    05 01 02 00
+
+[FRM-I-009]
+title  = Trame decodee trop courte
+expect = FWB_ERR_FRAME_TOO_SHORT
+note   = COBS valide, 3 octets decodes, minimum 9
+wire_len = 5
+wire =
+    04 01 02 03 00
+
+[FRM-I-010]
+title  = Delimiteur isole
+expect = FWB_OK
+note   = trame vide : ignoree silencieusement, aucune erreur, aucune livraison
+wire_len = 1
+wire =
+    00
+
+[FRM-I-011]
+title  = Delimiteur premature
+expect = FWB_ERR_FRAME_TOO_SHORT
+note   = la trame se termine a l'offset 2 : 1 octet decode
+wire_len = 4
+wire =
+    02 01 00 00

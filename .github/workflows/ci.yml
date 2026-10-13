@@ -1,0 +1,164 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Les scripts de controle n'utilisent que la bibliotheque standard.
+  PYTHONDONTWRITEBYTECODE: "1"
+
+jobs:
+  # --------------------------------------------------------------- 1. forme
+  format:
+    name: Formatage
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: clang-format --dry-run --Werror
+        run: |
+          # -r : ne rien lancer si la liste est vide. Au stade v0.0-spec il
+          # n'y a aucun fichier C, et l'absence de fichier n'est pas un echec.
+          find . -path ./build -prune -o \
+                 \( -name '*.c' -o -name '*.h' \) -print0 \
+            | xargs -0 -r clang-format --dry-run --Werror --style=file
+
+  # ----------------------------------------------- 2. coherence des specs
+  spec:
+    name: Specification
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+
+      - name: Vecteurs conformes a l'oracle
+        run: python3 -I tools/gen_vectors.py --check
+
+      - name: Documentation coherente
+        run: python3 -I tools/check_docs.py
+
+  # ------------------------------------------------------ 3. build et tests
+  build:
+    name: ${{ matrix.preset }} / ${{ matrix.cc }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [debug, release, asan-ubsan]
+        cc: [gcc, clang]
+        exclude:
+          # Un seul compilateur suffit pour la build de taille : elle verifie
+          # que le code compile en -Os avec NDEBUG, pas une specificite de
+          # compilateur.
+          - preset: release
+            cc: clang
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+
+      - name: Installer Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Configurer
+        run: cmake --preset ${{ matrix.preset }}
+
+      - name: Construire
+        run: cmake --build --preset ${{ matrix.preset }}
+
+      - name: Tester
+        run: ctest --preset ${{ matrix.preset }}
+
+      - name: Verifier que les en-tetes publics sont du C valide
+        run: cmake --build --preset ${{ matrix.preset }} --target fwb_header_c_compile
+
+  # ------------------------------------------------- 4. analyse statique
+  static-analysis:
+    name: Analyse statique
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+
+      - name: Installer les outils
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build cppcheck clang-tidy
+
+      # compile_commands.json doit etre produit par CLANG, pas par GCC :
+      # FwbWarnings ajoute des options propres a GCC (-Wlogical-op,
+      # -Wduplicated-cond...) que le frontal de clang-tidy rejette comme
+      # inconnues, ce qui fait echouer l'analyse avant meme de commencer.
+      - name: Configurer pour produire compile_commands.json
+        env:
+          CC: clang
+        run: cmake --preset debug
+
+      - name: clang-tidy
+        run: |
+          mapfile -t files < <(find common crc framing antireplay \
+                                    -name '*.c' -not -path '*/build/*' 2>/dev/null)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "Aucune source C a analyser (stade v0.0-spec)."
+            exit 0
+          fi
+          # --extra-arg : garde-fou si la base de compilation a malgre tout
+          # ete produite par GCC, par exemple en local.
+          clang-tidy -p build/debug \
+                     --extra-arg=-Wno-unknown-warning-option \
+                     --warnings-as-errors='*' "${files[@]}"
+
+      - name: cppcheck
+        run: |
+          # --error-exitcode fait echouer sur toute detection.
+          # L'addon MISRA n'est PAS active : son texte de regles est sous
+          # licence et n'est pas redistribuable (docs/conventions.md).
+          if ! find common crc framing antireplay -name '*.c' | grep -q .; then
+            echo "Aucune source C a analyser (stade v0.0-spec)."
+            exit 0
+          fi
+          cppcheck --enable=warning,style,performance,portability \
+                   --std=c11 --language=c \
+                   --inline-suppr \
+                   --suppress=missingIncludeSystem \
+                   --error-exitcode=1 \
+                   -I common/include -I crc/include \
+                   -I framing/include -I antireplay/include \
+                   common crc framing antireplay
+
+  # ------------------------------------------------------------- 5. fuzzing
+  fuzz:
+    name: Fuzzing (corpus)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+
+      - name: Installer Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Configurer
+        env:
+          CC: clang
+        run: cmake --preset fuzz
+
+      - name: Construire
+        run: cmake --build --preset fuzz
+
+      # Rejeu du corpus versionne uniquement. Une regression sur le corpus est
+      # bloquante ; l'exploration de nouvelles entrees se fait hors CI, avant
+      # chaque marquage de version. Voir docs/test-plan.md §5.
+      - name: Rejouer le corpus
+        run: ctest --preset fuzz-corpus

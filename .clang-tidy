@@ -1,0 +1,94 @@
+# Analyse statique du coeur C de fw-blocks.
+#
+# Ce fichier couvre le C. Un wrapper C++ (ADR-0001) aura son propre
+# .clang-tidy dans son repertoire : MISRA C et les regles C++ ne se
+# confondent pas, et une configuration unique finirait par n'etre severe
+# pour aucun des deux langages.
+#
+# Les regles MISRA C:2012 ne sont pas verifiees ici — leur texte est sous
+# licence et n'est pas redistribuable. Les regles ci-dessous couvrent une
+# partie de leurs intentions ; le reste passe par les options du compilateur
+# et par docs/conventions.md.
+
+Checks: >
+  -*,
+  bugprone-*,
+  cert-*,
+  clang-analyzer-*,
+  misc-*,
+  performance-*,
+  portability-*,
+  readability-*,
+  -bugprone-easily-swappable-parameters,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  -readability-function-cognitive-complexity,
+  -readability-avoid-const-params-in-decls,
+  -misc-include-cleaner,
+  -cert-dcl37-c,
+  -cert-dcl51-cpp
+
+# Justification des exclusions :
+#
+#   easily-swappable-parameters
+#       signale toute fonction a deux parametres de meme type. Un encodeur
+#       prend forcement un pointeur et une longueur ; le signaler partout
+#       noierait les vrais defauts.
+#
+#   identifier-length
+#       refuse les noms courts. « i » dans une boucle et « p » pour un
+#       curseur d'octets sont plus lisibles qu'une paraphrase.
+#
+#   magic-numbers
+#       les offsets du format de trame sont des constantes nommees, mais les
+#       tests manipulent des octets litteraux par nature.
+#
+#   function-cognitive-complexity
+#       un decodeur est une suite de controles sequentiels : sa complexite
+#       mesuree est elevee et sa lisibilite reelle, bonne. L'ordre des
+#       controles est fige par wire-format.md §7 et ne doit pas etre
+#       refactore pour satisfaire une metrique.
+#
+#   avoid-const-params-in-decls
+#       entre en conflit direct avec docs/conventions.md, qui impose const
+#       sur tout parametre non modifie.
+#
+#   include-cleaner
+#       trop de faux positifs sur les en-tetes systeme en C.
+#
+#   cert-dcl37-c / cert-dcl51-cpp
+#       signalent les identifiants reserves. Nos gardes d'inclusion
+#       commencent par FWB_, qui n'est pas reserve ; la regle se declenche
+#       neanmoins sur certains motifs.
+
+WarningsAsErrors: >
+  bugprone-*,
+  cert-*,
+  clang-analyzer-*,
+  portability-*
+
+HeaderFilterRegex: '.*/(common|crc|framing|antireplay)/(include|src)/.*\.h$'
+
+FormatStyle: file
+
+CheckOptions:
+  - key:   readability-braces-around-statements.ShortStatementLines
+    value: '0'
+  - key:   readability-function-size.LineThreshold
+    value: '80'
+  - key:   readability-function-size.NestingThreshold
+    value: '4'
+  - key:   bugprone-suspicious-enum-usage.StrictMode
+    value: 'true'
+  - key:   readability-identifier-naming.FunctionCase
+    value: 'lower_case'
+  - key:   readability-identifier-naming.VariableCase
+    value: 'lower_case'
+  - key:   readability-identifier-naming.MacroDefinitionCase
+    value: 'UPPER_CASE'
+  - key:   readability-identifier-naming.TypedefCase
+    value: 'lower_case'
+  - key:   readability-identifier-naming.TypedefSuffix
+    value: '_t'
+  - key:   readability-identifier-naming.EnumConstantCase
+    value: 'UPPER_CASE'
