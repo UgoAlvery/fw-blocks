@@ -8,6 +8,19 @@
 add_library(fwb_warnings INTERFACE)
 add_library(fwb::warnings ALIAS fwb_warnings)
 
+# Visibilite IDE : ajoute les en-tetes au projet des qu'ils existent.
+# Non bloquant au stade v0.0-spec : les briques non implementees n'ont
+# pas encore de headers.
+foreach(_hdr
+        ../crc/include/fwb/crc/crc.h
+        ../crc/src/crc_internal.h
+        ../common/include/fwb/fwb_common.h)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_hdr}")
+        target_sources(fwb_warnings INTERFACE "${_hdr}")
+    endif()
+endforeach()
+unset(_hdr)
+
 set(_fwb_c_warnings
     -Wall
     -Wextra
