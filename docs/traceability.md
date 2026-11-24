@@ -9,7 +9,7 @@ maintenant qu'il faut s'en apercevoir, pas à la fin.
 
 | | Nombre |
 |---|---|
-| Exigences spécifiées | 113 |
+| Exigences spécifiées | 111 |
 | Exigences implémentées | 0 |
 | Exigences vérifiées par un test qui passe | 0 |
 
@@ -71,8 +71,6 @@ main ne couvre l'espace des entrées malformées.
 | `CRC-REQ-036` | Le contexte de calcul ne doit contenir aucun pointeur vers les données absorbées. | INSP | `crc/src/crc.c` | revue de code |
 | `CRC-REQ-040` | Les implémentations bit à bit et par table doivent produire des résultats identiques… | TU, FUZZ | `crc/src/crc_table.c` | `crc/tests/unit/test_crc_impl_equiv.c` |
 | `CRC-REQ-041` | Le choix de l'implémentation doit se faire à la compilation, sans modification du… | TU, INSP | `crc/src/crc_table.c` | `crc/tests/unit/test_crc_impl_equiv.c` |
-| `CRC-REQ-042` | L'implémentation par table ne doit pas consommer plus de 512 octets de données… | INSP | `crc/src/crc_table.c` | revue de code |
-| `CRC-REQ-043` | Les tables doivent être produites par expression constante à la compilation, sans… | INSP | `crc/src/crc_table.c` | revue de code |
 | `CRC-REQ-044` | L'implémentation bit à bit ne doit consommer aucune donnée constante. | INSP | `crc/src/crc_table.c` | revue de code |
 | `CRC-REQ-050` | Aucune exécution ne doit provoquer de lecture hors limites, quelle que soit la… | FUZZ | `crc/src/crc.c` | `crc/fuzz/fuzz_crc.c` |
 | `CRC-REQ-051` | Aucune exécution ne doit déclencher de comportement indéfini détectable par… | FUZZ | `crc/src/crc.c` | `crc/fuzz/fuzz_crc.c` |
@@ -149,7 +147,7 @@ main ne couvre l'espace des entrées malformées.
 | `AR-REQ-003` | La brique ne doit dépendre d'aucune autre brique que `fwb_common`, et en particulier… | INSP | `antireplay/src/antireplay.c` | revue de code |
 | `AR-REQ-004` | Toute fonction publique recevant un pointeur nul doit renvoyer `FWB_ERR_INVALID_ARG`… | TU | `antireplay/src/antireplay.c` | `antireplay/tests/unit/test_ar_api.c` |
 | `AR-REQ-005` | `FWB_ANTIREPLAY_WINDOW` doit être configurable à la compilation parmi 8, 16, 32 et… | TU | `antireplay/src/antireplay.c` | `antireplay/tests/unit/test_ar_api.c` |
-| `AR-REQ-006` | L'état d'une instance ne doit pas dépasser 10 octets pour `W = 64`. | INSP | `antireplay/src/antireplay.c` | revue de code |
+| `AR-REQ-006` | L'état d'une instance ne doit pas dépasser 16 octets pour `W = 64`, bourrage inclus. | INSP | `antireplay/src/antireplay.c` | revue de code |
 | `AR-REQ-010` | Après initialisation, le contexte doit être dans l'état « non amorcé », distinct de… | TU | `antireplay/src/antireplay.c` | `antireplay/tests/unit/test_ar_seed.c` |
 | `AR-REQ-011` | Dans l'état non amorcé, la première valeur soumise doit être acceptée sans contrôle… | TU | `antireplay/src/antireplay.c` | `antireplay/tests/unit/test_ar_seed.c` |
 | `AR-REQ-012` | L'acceptation de cette première valeur doit faire passer le contexte à l'état amorcé… | TU | `antireplay/src/antireplay.c` | `antireplay/tests/unit/test_ar_seed.c` |

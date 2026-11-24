@@ -82,6 +82,23 @@ Négatives, assumées :
   une version entièrement figée à la compilation. Négligeable devant le coût du
   calcul lui-même, et récupérable par `inline` si le besoin apparaît.
 
+
+## Contraintes de conception vérifiables
+
+Ces deux points étaient initialement formulés comme des exigences
+(REQ-042, REQ-043). Ils décrivent l'implémentation choisie
+ci-dessus, pas un besoin : ils restent vérifiés par revue de code (`INSP`),
+mais ici plutôt que dans `crc/docs/requirements.md`.
+
+- L'implémentation par table ne doit pas consommer plus de 512 octets de
+  données constantes pour une variante 16 bits, ni plus de 1024 octets pour une
+  variante 32 bits — c'est le chiffre annoncé plus haut, et un dépassement
+  signalerait que l'implémentation a dérivé du modèle décrit dans cet ADR.
+- Les tables doivent être produites par expression constante à la compilation,
+  sans script externe ni fichier généré versionné — pour qu'elles restent
+  dérivées des six paramètres, jamais une source de vérité parallèle à
+  maintenir à la main.
+
 ## Alternatives écartées
 
 - **CRC figé.** Non réutilisable, et oblige à dupliquer le code pour chaque

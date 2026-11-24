@@ -3,11 +3,11 @@
 
 fwb_add_brick(NAME common
     SOURCES
-        # src/status.c
+        src/status.c
 )
 
 fwb_add_brick_tests(BRICK common
     SOURCES
-        # tests/unit/test_endian.c
-        # tests/unit/test_status.c
+        tests/unit/test_endian.c
+        tests/unit/test_status.c
 )
