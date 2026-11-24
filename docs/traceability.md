@@ -10,12 +10,12 @@ maintenant qu'il faut s'en apercevoir, pas à la fin.
 | | Nombre |
 |---|---|
 | Exigences spécifiées | 111 |
-| Exigences implémentées | 0 |
-| Exigences vérifiées par un test qui passe | 0 |
+| Exigences implémentées | 27 |
+| Exigences vérifiées par un test qui passe | 19 |
 
-Le dépôt est au stade `v0.0-spec`. Les colonnes « Module prévu » et « Test
-prévu » sont des engagements, pas des constats : aucun de ces fichiers n'existe
-encore.
+`fwb_crc` est implémenté (27/27 req). 19 vérifiées par TU/VEC passants, 6 par
+INSP, 2 attendent `fuzz_crc.c` (REQ-050, REQ-051). `fwb_common` implémenté,
+non tracé. `fwb_framing` et `fwb_antireplay` au stade spec.
 
 ## Règles de tenue
 

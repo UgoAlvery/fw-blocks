@@ -47,6 +47,10 @@ function(fwb_add_header_c_compile_target)
 
     add_library(fwb_header_c_compile OBJECT ${_stubs})
     target_link_libraries(fwb_header_c_compile PRIVATE fwb::warnings)
+    get_property(_all_bricks GLOBAL PROPERTY FWB_ALL_BRICKS)
+    foreach(_b IN LISTS _all_bricks)
+        target_link_libraries(fwb_header_c_compile PRIVATE fwb::${_b})
+    endforeach()
     set_target_properties(fwb_header_c_compile PROPERTIES
         C_STANDARD 11
         C_EXTENSIONS OFF)
