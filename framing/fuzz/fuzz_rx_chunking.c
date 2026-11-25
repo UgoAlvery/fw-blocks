@@ -24,8 +24,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     const uint8_t *stream = data + 1U;
     size_t slen = size - 1U;
 
-    static fwb_framing_rx_t rx1, rx2;
-    static fwb_framing_frame_t f1, f2;
+    static fwb_framing_rx_t rx1;
+    static fwb_framing_rx_t rx2;
+    static fwb_framing_frame_t f1;
+    static fwb_framing_frame_t f2;
 
     (void)fwb_framing_rx_init(&rx1, &k_cfg, 0U);
     (void)fwb_framing_rx_init(&rx2, &k_cfg, 0U);

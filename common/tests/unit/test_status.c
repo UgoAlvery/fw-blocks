@@ -51,7 +51,8 @@ static void test_status_str_renvoie_non_nul(void)
 
 static void test_status_str_code_inconnu(void)
 {
-    fwb_status_t inconnue = (fwb_status_t)(-99);
+    fwb_status_t inconnue =
+        (fwb_status_t)(-99);  // NOLINT(clang-analyzer-optin.core.EnumCastOutOfRange)
     TEST_ASSERT_NOT_NULL(fwb_status_str(inconnue));
 }
 

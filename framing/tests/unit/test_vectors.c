@@ -1,60 +1,90 @@
 /* Reads FWB_VECTORS_PATH at runtime and runs each vector through the rx. */
-#include <ctype.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "fwb/framing/framing.h"
+
 #include "unity.h"
 
 #ifndef FWB_VECTORS_PATH
-#error "Define FWB_VECTORS_PATH to the path of vectors.txt"
+#    error "Define FWB_VECTORS_PATH to the path of vectors.txt"
 #endif
 
-void setUp(void)  {}
-void tearDown(void) {}
+void setUp(void)
+{
+}
+void tearDown(void)
+{
+}
 
 /* ---- minimal parser ---- */
 
-#define MAX_WIRE 268
-#define MAX_ID   32
+#define MAX_WIRE  268
+#define MAX_ID    32
 #define MAX_TITLE 128
 #define MAX_NOTE  256
 
 typedef struct {
-    char         id[MAX_ID];
+    char id[MAX_ID];
     fwb_status_t expect;
-    uint16_t     link_id;
-    uint8_t      wire[MAX_WIRE];
-    size_t       wire_len;
-    bool         has_wire;
+    uint16_t link_id;
+    uint8_t wire[MAX_WIRE];
+    size_t wire_len;
+    bool has_wire;
 } vector_t;
 
 /* Returns pointer to value after "key[spaces]=[spaces]", or NULL. */
 static const char *key_val(const char *line, const char *key)
 {
     size_t klen = strlen(key);
-    if (strncmp(line, key, klen) != 0) return NULL;
+    if (strncmp(line, key, klen) != 0) {
+        return NULL;
+    }
     const char *p = line + klen;
-    while (*p == ' ' || *p == '\t') p++;
-    if (*p != '=') return NULL;
+    while (*p == ' ' || *p == '\t') {
+        p++;
+    }
+    if (*p != '=') {
+        return NULL;
+    }
     p++;
-    while (*p == ' ' || *p == '\t') p++;
+    while (*p == ' ' || *p == '\t') {
+        p++;
+    }
     return p;
 }
 
 static fwb_status_t parse_expect(const char *s)
 {
-    if (strcmp(s, "FWB_OK")                 == 0) return FWB_OK;
-    if (strcmp(s, "FWB_ERR_BAD_CRC")        == 0) return FWB_ERR_BAD_CRC;
-    if (strcmp(s, "FWB_ERR_BAD_VERSION")    == 0) return FWB_ERR_BAD_VERSION;
-    if (strcmp(s, "FWB_ERR_BAD_FLAGS")      == 0) return FWB_ERR_BAD_FLAGS;
-    if (strcmp(s, "FWB_ERR_FRAME_TOO_SHORT") == 0) return FWB_ERR_FRAME_TOO_SHORT;
-    if (strcmp(s, "FWB_ERR_PAYLOAD_TOO_LARGE") == 0) return FWB_ERR_PAYLOAD_TOO_LARGE;
-    if (strcmp(s, "FWB_ERR_LENGTH_MISMATCH") == 0) return FWB_ERR_LENGTH_MISMATCH;
-    if (strcmp(s, "FWB_ERR_COBS_MALFORMED") == 0) return FWB_ERR_COBS_MALFORMED;
+    if (strcmp(s, "FWB_OK") == 0) {
+        return FWB_OK;
+    }
+    if (strcmp(s, "FWB_ERR_BAD_CRC") == 0) {
+        return FWB_ERR_BAD_CRC;
+    }
+    if (strcmp(s, "FWB_ERR_BAD_VERSION") == 0) {
+        return FWB_ERR_BAD_VERSION;
+    }
+    if (strcmp(s, "FWB_ERR_BAD_FLAGS") == 0) {
+        return FWB_ERR_BAD_FLAGS;
+    }
+    if (strcmp(s, "FWB_ERR_FRAME_TOO_SHORT") == 0) {
+        return FWB_ERR_FRAME_TOO_SHORT;
+    }
+    if (strcmp(s, "FWB_ERR_PAYLOAD_TOO_LARGE") == 0) {
+        return FWB_ERR_PAYLOAD_TOO_LARGE;
+    }
+    if (strcmp(s, "FWB_ERR_LENGTH_MISMATCH") == 0) {
+        return FWB_ERR_LENGTH_MISMATCH;
+    }
+    if (strcmp(s, "FWB_ERR_COBS_MALFORMED") == 0) {
+        return FWB_ERR_COBS_MALFORMED;
+    }
     return FWB_OK; /* unknown: treat as OK */
 }
 
@@ -70,22 +100,23 @@ static uint16_t parse_link_id(const char *note)
 
 /* Run one vector through the rx. FRM-I-010 (empty wire = just delimiter)
  * is handled: rx sees 0x00 from IDLE → FWB_OK, no frame. */
+// NOLINTNEXTLINE(readability-function-size)
 static void run_vector(const vector_t *v)
 {
     fwb_framing_cfg_t cfg = {.link_id = v->link_id};
-    fwb_framing_rx_t  rx;
+    fwb_framing_rx_t rx;
     fwb_framing_frame_t frame;
     (void)fwb_framing_rx_init(&rx, &cfg, 0U);
 
-    fwb_status_t last_err  = FWB_OK;
-    bool         got_frame = false;
+    fwb_status_t last_err = FWB_OK;
+    bool got_frame = false;
 
     for (size_t i = 0U; i < v->wire_len; i++) {
         bool r = false;
         fwb_status_t st = fwb_framing_rx_push(&rx, v->wire[i], &frame, &r);
         if (r) {
             got_frame = true;
-            last_err  = FWB_OK;
+            last_err = FWB_OK;
         } else if (st != FWB_OK) {
             last_err = st;
         }
@@ -106,6 +137,7 @@ static void run_vector(const vector_t *v)
     }
 }
 
+// NOLINTNEXTLINE(readability-function-size)
 static void test_all_vectors(void)
 {
     FILE *f = fopen(FWB_VECTORS_PATH, "r");
@@ -114,11 +146,11 @@ static void test_all_vectors(void)
         return;
     }
 
-    char     line[512];
+    char line[512];
     vector_t v;
     memset(&v, 0, sizeof(v));
-    int    vectors_run = 0;
-    bool   in_wire     = false;
+    int vectors_run = 0;
+    bool in_wire = false;
 
     while (fgets(line, sizeof(line), f) != NULL) {
         /* Strip trailing newline. */
@@ -146,7 +178,9 @@ static void test_all_vectors(void)
             continue;
         }
 
-        if (v.id[0] == '\0') continue; /* Not inside a section yet. */
+        if (v.id[0] == '\0') {
+            continue; /* Not inside a section yet. */
+        }
 
         /* Blank line: stop wire parsing. */
         if (len == 0U) {
@@ -155,7 +189,9 @@ static void test_all_vectors(void)
         }
 
         /* Comments. */
-        if (line[0] == '#') continue;
+        if (line[0] == '#') {
+            continue;
+        }
 
         /* "wire =" starts hex block; subsequent indented lines are data. */
         const char *wire_val = key_val(line, "wire");
@@ -166,10 +202,16 @@ static void test_all_vectors(void)
             if (*p != '\0' && *p != '#') {
                 /* Parse hex on this same line. */
                 while (*p != '\0') {
-                    while (*p == ' ' || *p == '\t') p++;
-                    if (!isxdigit((unsigned char)*p)) break;
+                    while (*p == ' ' || *p == '\t') {
+                        p++;
+                    }
+                    if (!isxdigit((unsigned char)*p)) {
+                        break;
+                    }
                     char hi = *p++;
-                    if (!isxdigit((unsigned char)*p)) break;
+                    if (!isxdigit((unsigned char)*p)) {
+                        break;
+                    }
                     char lo = *p++;
                     char buf[3] = {hi, lo, '\0'};
                     if (v.wire_len < MAX_WIRE) {
@@ -185,10 +227,16 @@ static void test_all_vectors(void)
             /* Continuation hex line. */
             const char *p = line;
             while (*p != '\0') {
-                while (*p == ' ' || *p == '\t') p++;
-                if (!isxdigit((unsigned char)*p)) break;
+                while (*p == ' ' || *p == '\t') {
+                    p++;
+                }
+                if (!isxdigit((unsigned char)*p)) {
+                    break;
+                }
                 char hi = *p++;
-                if (!isxdigit((unsigned char)*p)) break;
+                if (!isxdigit((unsigned char)*p)) {
+                    break;
+                }
                 char lo = *p++;
                 char buf[3] = {hi, lo, '\0'};
                 if (v.wire_len < MAX_WIRE) {
@@ -229,10 +277,10 @@ static void test_all_vectors(void)
         vectors_run++;
     }
 
-    fclose(f);
+    (void)fclose(f);
 
     char msg[64];
-    snprintf(msg, sizeof(msg), "Ran %d vectors", vectors_run);
+    (void)snprintf(msg, sizeof(msg), "Ran %d vectors", vectors_run);
     TEST_MESSAGE(msg);
     TEST_ASSERT_GREATER_THAN_INT(0, vectors_run);
 }

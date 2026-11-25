@@ -1,10 +1,15 @@
 #include <stdint.h>
 
 #include "fwb/antireplay/antireplay.h"
+
 #include "unity.h"
 
-void setUp(void)  {}
-void tearDown(void) {}
+void setUp(void)
+{
+}
+void tearDown(void)
+{
+}
 
 /* AR-REQ-005 */
 static void test_window_default(void)

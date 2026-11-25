@@ -5,8 +5,8 @@
 
 #include "unity.h"
 
-static const uint8_t MSG[] = "123456789";
-#define MSG_LEN (sizeof(MSG) - 1U)
+static const uint8_t msg[] = "123456789";
+#define MSG_LEN (sizeof(msg) - 1U)
 
 void setUp(void)
 {
@@ -27,7 +27,7 @@ static void test_crc32_iso_hdlc(void)
         .xorout = 0xFFFFFFFFU,
     };
     uint32_t result = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&p, MSG, MSG_LEN, &result));
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&p, msg, MSG_LEN, &result));
     TEST_ASSERT_EQUAL_HEX32(0xCBF43926U, result);
 }
 
@@ -43,7 +43,7 @@ static void test_crc16_arc(void)
         .xorout = 0x0000U,
     };
     uint32_t result = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&p, MSG, MSG_LEN, &result));
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&p, msg, MSG_LEN, &result));
     TEST_ASSERT_EQUAL_HEX32(0x0000BB3DU, result);
 }
 
@@ -52,7 +52,7 @@ static void test_ccitt_false(void)
 {
     uint32_t result = 0U;
     TEST_ASSERT_EQUAL_INT(FWB_OK,
-                          fwb_crc_oneshot(&fwb_crc_params_ccitt_false, MSG, MSG_LEN, &result));
+                          fwb_crc_oneshot(&fwb_crc_params_ccitt_false, msg, MSG_LEN, &result));
     TEST_ASSERT_EQUAL_HEX32(0x000029B1U, result);
 }
 
@@ -60,7 +60,7 @@ static void test_ccitt_false(void)
 static void test_crc32c(void)
 {
     uint32_t result = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&fwb_crc_params_crc32c, MSG, MSG_LEN, &result));
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&fwb_crc_params_crc32c, msg, MSG_LEN, &result));
     TEST_ASSERT_EQUAL_HEX32(0xE3069283U, result);
 }
 
@@ -76,7 +76,7 @@ static void test_crc16_tms37157(void)
         .xorout = 0x0000U,
     };
     uint32_t result = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&p, MSG, MSG_LEN, &result));
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&p, msg, MSG_LEN, &result));
     TEST_ASSERT_EQUAL_HEX32(0x000026B1U, result);
 }
 

@@ -1,5 +1,6 @@
 #include "crc_internal.h"
 
+// NOLINTNEXTLINE(readability-function-size)
 uint32_t fwb_crc_state_update_bitwise(uint32_t reg, const uint8_t *data, size_t len,
                                       const fwb_crc_params_t *params)
 {

@@ -1,10 +1,10 @@
-#include "fwb/framing/framing.h"
-#include "framing_internal.h"
+#include <string.h>
 
 #include "fwb/common/endian.h"
 #include "fwb/crc/crc.h"
+#include "fwb/framing/framing.h"
 
-#include <string.h>
+#include "framing_internal.h"
 
 /* FRM-REQ-010 to 021 */
 
@@ -17,11 +17,9 @@ size_t fwb_framing_encoded_size(uint16_t payload_len)
     return frame_len + 1U + (frame_len / 254U) + 1U; /* COBS overhead + delimiter */
 }
 
-fwb_status_t fwb_framing_encode(const fwb_framing_cfg_t *cfg,
-                                uint8_t type, uint16_t seq,
-                                const uint8_t *payload, uint16_t payload_len,
-                                uint8_t *dst, size_t dst_cap,
-                                size_t *out_len)
+fwb_status_t fwb_framing_encode(const fwb_framing_cfg_t *cfg, uint8_t type, uint16_t seq,
+                                const uint8_t *payload, uint16_t payload_len, uint8_t *dst,
+                                size_t dst_cap, size_t *out_len)
 {
     if (cfg == NULL || dst == NULL || out_len == NULL) {
         return FWB_ERR_INVALID_ARG;
@@ -40,7 +38,7 @@ fwb_status_t fwb_framing_encode(const fwb_framing_cfg_t *cfg,
 
     /* Build decoded frame in a local buffer. */
     uint8_t frame[FWB_FRAMING_MAX_FRAME_SIZE];
-    size_t  frame_len = FWB_FRAMING_HEADER_SIZE + (size_t)payload_len + FWB_FRAMING_CRC_SIZE;
+    size_t frame_len = FWB_FRAMING_HEADER_SIZE + (size_t)payload_len + FWB_FRAMING_CRC_SIZE;
 
     /* FRM-REQ-011, 012, 013: header */
     frame[0] = (uint8_t)FWB_FRAMING_VERSION; /* VER  */
@@ -55,7 +53,7 @@ fwb_status_t fwb_framing_encode(const fwb_framing_cfg_t *cfg,
     }
 
     /* FRM-REQ-014: CRC over link_id (LE) || header || payload. */
-    uint8_t  link_id_bytes[2];
+    uint8_t link_id_bytes[2];
     fwb_wr_u16_le(link_id_bytes, cfg->link_id);
 
     fwb_crc_ctx_t crc_ctx;

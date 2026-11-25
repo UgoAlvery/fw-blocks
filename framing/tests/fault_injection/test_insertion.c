@@ -5,16 +5,20 @@
 #include <string.h>
 
 #include "fwb/framing/framing.h"
+
 #include "unity.h"
 
-void setUp(void)  {}
-void tearDown(void) {}
+void setUp(void)
+{
+}
+void tearDown(void)
+{
+}
 
 static fwb_framing_cfg_t cfg_zero = {.link_id = 0x0000U};
 
 /* Insert a 0x00 at position ins_pos (before the delimiter). */
-static void insert_zero_and_check(const uint8_t *wire, size_t wire_len,
-                                  size_t ins_pos)
+static void insert_zero_and_check(const uint8_t *wire, size_t wire_len, size_t ins_pos)
 {
     /* Build modified wire: original[0..ins_pos-1], 0x00, original[ins_pos..wire_len-1]. */
     uint8_t buf[FWB_FRAMING_MAX_WIRE_SIZE * 2U];
@@ -23,7 +27,7 @@ static void insert_zero_and_check(const uint8_t *wire, size_t wire_len,
     memcpy(&buf[ins_pos + 1U], &wire[ins_pos], wire_len - ins_pos);
     size_t new_len = wire_len + 1U;
 
-    fwb_framing_rx_t    rx;
+    fwb_framing_rx_t rx;
     fwb_framing_frame_t frame;
     bool ready = false;
     (void)fwb_framing_rx_init(&rx, &cfg_zero, 0U);
@@ -50,10 +54,9 @@ static void test_insert_zero_v002(void)
 {
     static const uint8_t payload[] = {0x41U, 0x42U, 0x43U};
     uint8_t wire[FWB_FRAMING_MAX_WIRE_SIZE];
-    size_t  n = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_OK,
-        fwb_framing_encode(&cfg_zero, 0x20U, 1U,
-                           payload, sizeof(payload), wire, sizeof(wire), &n));
+    size_t n = 0U;
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_encode(&cfg_zero, 0x20U, 1U, payload, sizeof(payload),
+                                                     wire, sizeof(wire), &n));
 
     /* Insert before each byte (before the delimiter). */
     for (size_t pos = 0U; pos < n - 1U; pos++) {

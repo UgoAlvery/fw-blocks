@@ -5,7 +5,7 @@
 
 #include "unity.h"
 
-static const fwb_crc_params_t VALID = {
+static const fwb_crc_params_t valid = {
     .width = 32U,
     .poly = 0x04C11DB7U,
     .init = 0xFFFFFFFFU,
@@ -13,9 +13,9 @@ static const fwb_crc_params_t VALID = {
     .refout = true,
     .xorout = 0xFFFFFFFFU,
 };
-static const fwb_crc_params_t BAD_LOW = {.width = 7U};
-static const fwb_crc_params_t BAD_HIGH = {.width = 33U};
-static const uint8_t DATA[] = {0xAAU, 0xBBU};
+static const fwb_crc_params_t bad_low = {.width = 7U};
+static const fwb_crc_params_t bad_high = {.width = 33U};
+static const uint8_t data[] = {0xAAU, 0xBBU};
 
 void setUp(void)
 {
@@ -27,7 +27,7 @@ void tearDown(void)
 /* CRC-REQ-003 */
 static void test_init_null_ctx(void)
 {
-    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_init(NULL, &VALID));
+    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_init(NULL, &valid));
 }
 
 /* CRC-REQ-003 */
@@ -41,27 +41,27 @@ static void test_init_null_params(void)
 static void test_init_width_too_small(void)
 {
     fwb_crc_ctx_t ctx;
-    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_init(&ctx, &BAD_LOW));
+    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_init(&ctx, &bad_low));
 }
 
 /* CRC-REQ-003 */
 static void test_init_width_too_large(void)
 {
     fwb_crc_ctx_t ctx;
-    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_init(&ctx, &BAD_HIGH));
+    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_init(&ctx, &bad_high));
 }
 
 /* CRC-REQ-003 */
 static void test_update_null_ctx(void)
 {
-    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_update(NULL, DATA, sizeof(DATA)));
+    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_update(NULL, data, sizeof(data)));
 }
 
 /* CRC-REQ-003 */
 static void test_update_null_data_nonzero_len(void)
 {
     fwb_crc_ctx_t ctx;
-    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_init(&ctx, &VALID));
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_init(&ctx, &valid));
     TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_update(&ctx, NULL, 1U));
 }
 
@@ -69,7 +69,7 @@ static void test_update_null_data_nonzero_len(void)
 static void test_update_null_data_zero_len(void)
 {
     fwb_crc_ctx_t ctx;
-    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_init(&ctx, &VALID));
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_init(&ctx, &valid));
     TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_update(&ctx, NULL, 0U));
 }
 
@@ -84,7 +84,7 @@ static void test_finalize_null_ctx(void)
 static void test_finalize_null_result(void)
 {
     fwb_crc_ctx_t ctx;
-    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_init(&ctx, &VALID));
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_init(&ctx, &valid));
     TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_finalize(&ctx, NULL));
 }
 
@@ -92,27 +92,27 @@ static void test_finalize_null_result(void)
 static void test_oneshot_null_params(void)
 {
     uint32_t result = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_oneshot(NULL, DATA, sizeof(DATA), &result));
+    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_oneshot(NULL, data, sizeof(data), &result));
 }
 
 /* CRC-REQ-003 */
 static void test_oneshot_null_result(void)
 {
-    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_oneshot(&VALID, DATA, sizeof(DATA), NULL));
+    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_oneshot(&valid, data, sizeof(data), NULL));
 }
 
 /* CRC-REQ-003 */
 static void test_oneshot_null_data_nonzero_len(void)
 {
     uint32_t result = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_oneshot(&VALID, NULL, 1U, &result));
+    TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG, fwb_crc_oneshot(&valid, NULL, 1U, &result));
 }
 
 /* CRC-REQ-003 */
 static void test_oneshot_null_data_zero_len(void)
 {
     uint32_t result = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&VALID, NULL, 0U, &result));
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&valid, NULL, 0U, &result));
 }
 
 /* CRC-REQ-003 */
@@ -120,7 +120,7 @@ static void test_oneshot_width_too_small(void)
 {
     uint32_t result = 0U;
     TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG,
-                          fwb_crc_oneshot(&BAD_LOW, DATA, sizeof(DATA), &result));
+                          fwb_crc_oneshot(&bad_low, data, sizeof(data), &result));
 }
 
 /* CRC-REQ-003 */
@@ -128,7 +128,7 @@ static void test_oneshot_width_too_large(void)
 {
     uint32_t result = 0U;
     TEST_ASSERT_EQUAL_INT(FWB_ERR_INVALID_ARG,
-                          fwb_crc_oneshot(&BAD_HIGH, DATA, sizeof(DATA), &result));
+                          fwb_crc_oneshot(&bad_high, data, sizeof(data), &result));
 }
 
 /* CRC-REQ-004, CRC-REQ-052 */

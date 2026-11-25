@@ -5,8 +5,8 @@
 
 #include "unity.h"
 
-static const uint8_t MSG[] = "123456789";
-#define MSG_LEN (sizeof(MSG) - 1U)
+static const uint8_t msg[] = "123456789";
+#define MSG_LEN (sizeof(msg) - 1U)
 
 void setUp(void)
 {
@@ -27,7 +27,7 @@ static void test_width8_smbus(void)
         .xorout = 0x00U,
     };
     uint32_t result = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&p, MSG, MSG_LEN, &result));
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&p, msg, MSG_LEN, &result));
     TEST_ASSERT_EQUAL_HEX32(0xF4U, result);
 }
 
@@ -36,7 +36,7 @@ static void test_width16_ccitt_false(void)
 {
     uint32_t result = 0U;
     TEST_ASSERT_EQUAL_INT(FWB_OK,
-                          fwb_crc_oneshot(&fwb_crc_params_ccitt_false, MSG, MSG_LEN, &result));
+                          fwb_crc_oneshot(&fwb_crc_params_ccitt_false, msg, MSG_LEN, &result));
     TEST_ASSERT_EQUAL_HEX32(0x29B1U, result);
 }
 
@@ -44,7 +44,7 @@ static void test_width16_ccitt_false(void)
 static void test_width32_crc32c(void)
 {
     uint32_t result = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&fwb_crc_params_crc32c, MSG, MSG_LEN, &result));
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&fwb_crc_params_crc32c, msg, MSG_LEN, &result));
     TEST_ASSERT_EQUAL_HEX32(0xE3069283U, result);
 }
 
@@ -60,7 +60,7 @@ static void test_refin1_refout0(void)
         .xorout = 0x0000U,
     };
     uint32_t result = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&p, MSG, MSG_LEN, &result));
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_crc_oneshot(&p, msg, MSG_LEN, &result));
     TEST_ASSERT_EQUAL_HEX32(0x0BC6U, result);
 }
 

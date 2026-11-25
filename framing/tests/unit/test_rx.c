@@ -3,17 +3,21 @@
 #include <string.h>
 
 #include "fwb/framing/framing.h"
+
 #include "unity.h"
 
-void setUp(void)  {}
-void tearDown(void) {}
+void setUp(void)
+{
+}
+void tearDown(void)
+{
+}
 
 static fwb_framing_cfg_t cfg_zero = {.link_id = 0x0000U};
 
 /* Push a byte array through rx, return status of the last significant event. */
-static fwb_status_t push_bytes(fwb_framing_rx_t *rx, const uint8_t *data,
-                               size_t len, fwb_framing_frame_t *out,
-                               bool *ready)
+static fwb_status_t push_bytes(fwb_framing_rx_t *rx, const uint8_t *data, size_t len,
+                               fwb_framing_frame_t *out, bool *ready)
 {
     fwb_status_t last = FWB_OK;
     *ready = false;
@@ -22,7 +26,7 @@ static fwb_status_t push_bytes(fwb_framing_rx_t *rx, const uint8_t *data,
         fwb_status_t st = fwb_framing_rx_push(rx, data[i], out, &r);
         if (r) {
             *ready = true;
-            last   = st;
+            last = st;
         } else if (st != FWB_OK) {
             last = st;
         }
@@ -35,12 +39,11 @@ static void test_rx_basic_frame(void)
 {
     static const uint8_t payload[] = {0x41U, 0x42U, 0x43U};
     uint8_t wire[FWB_FRAMING_MAX_WIRE_SIZE];
-    size_t  n = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_OK,
-        fwb_framing_encode(&cfg_zero, 0x20U, 1U,
-                           payload, sizeof(payload), wire, sizeof(wire), &n));
+    size_t n = 0U;
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_encode(&cfg_zero, 0x20U, 1U, payload, sizeof(payload),
+                                                     wire, sizeof(wire), &n));
 
-    fwb_framing_rx_t    rx;
+    fwb_framing_rx_t rx;
     fwb_framing_frame_t frame;
     bool ready = false;
     TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_rx_init(&rx, &cfg_zero, 0U));
@@ -57,7 +60,7 @@ static void test_rx_basic_frame(void)
 /* FRM-REQ-082: délimiteur isolé → FWB_OK, pas de livraison. */
 static void test_rx_empty_frame_ignored(void)
 {
-    fwb_framing_rx_t    rx;
+    fwb_framing_rx_t rx;
     fwb_framing_frame_t frame;
     bool ready = false;
     TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_rx_init(&rx, &cfg_zero, 0U));
@@ -70,7 +73,7 @@ static void test_rx_empty_frame_ignored(void)
 /* FRM-REQ-083: overflow → FWB_ERR_OVERFLOW. */
 static void test_rx_overflow(void)
 {
-    fwb_framing_rx_t    rx;
+    fwb_framing_rx_t rx;
     fwb_framing_frame_t frame;
     bool ready = false;
     TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_rx_init(&rx, &cfg_zero, 0U));
@@ -92,13 +95,11 @@ static void test_rx_discard_after_overflow(void)
 {
     static const uint8_t payload[] = {0x41U, 0x42U};
     uint8_t good_wire[FWB_FRAMING_MAX_WIRE_SIZE];
-    size_t  n = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_OK,
-        fwb_framing_encode(&cfg_zero, 0x01U, 5U,
-                           payload, sizeof(payload),
-                           good_wire, sizeof(good_wire), &n));
+    size_t n = 0U;
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_encode(&cfg_zero, 0x01U, 5U, payload, sizeof(payload),
+                                                     good_wire, sizeof(good_wire), &n));
 
-    fwb_framing_rx_t    rx;
+    fwb_framing_rx_t rx;
     fwb_framing_frame_t frame;
     bool ready = false;
     TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_rx_init(&rx, &cfg_zero, 0U));
@@ -117,20 +118,19 @@ static void test_rx_discard_after_overflow(void)
     TEST_ASSERT_EQUAL_UINT(5U, frame.seq);
 }
 
-/* FRM-REQ-085, FRM-REQ-090: after bad CRC, next valid frame accepted; each rejection has a distinct code. */
+/* FRM-REQ-085, FRM-REQ-090: after bad CRC, next valid frame accepted; each rejection has a distinct
+ * code. */
 static void test_rx_recover_after_bad_crc(void)
 {
     /* Corrupt wire: flip last CRC byte of a valid frame. */
     uint8_t wire[FWB_FRAMING_MAX_WIRE_SIZE];
-    size_t  n = 0U;
+    size_t n = 0U;
     static const uint8_t payload[] = {0x01U};
-    TEST_ASSERT_EQUAL_INT(FWB_OK,
-        fwb_framing_encode(&cfg_zero, 0x01U, 0U,
-                           payload, sizeof(payload),
-                           wire, sizeof(wire), &n));
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_encode(&cfg_zero, 0x01U, 0U, payload, sizeof(payload),
+                                                     wire, sizeof(wire), &n));
     wire[n - 2U] ^= 0x01U; /* corrupt CRC byte (before delimiter) */
 
-    fwb_framing_rx_t    rx;
+    fwb_framing_rx_t rx;
     fwb_framing_frame_t frame;
     bool ready = false;
     TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_rx_init(&rx, &cfg_zero, 0U));
@@ -150,7 +150,7 @@ static void test_rx_recover_after_bad_crc(void)
 /* FRM-REQ-087: timeout abandons frame in progress. */
 static void test_rx_timeout(void)
 {
-    fwb_framing_rx_t    rx;
+    fwb_framing_rx_t rx;
     fwb_framing_frame_t frame;
     bool ready = false;
     TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_rx_init(&rx, &cfg_zero, 3U));
@@ -180,7 +180,7 @@ static void test_rx_tick_in_idle(void)
 /* FRM-REQ-089: reset restores IDLE state. */
 static void test_rx_reset(void)
 {
-    fwb_framing_rx_t    rx;
+    fwb_framing_rx_t rx;
     fwb_framing_frame_t frame;
     bool ready = false;
     TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_rx_init(&rx, &cfg_zero, 0U));
@@ -202,14 +202,16 @@ static void test_rx_push_buf_equiv(void)
 {
     static const uint8_t payload[] = {0x10U, 0x20U, 0x30U};
     uint8_t wire[FWB_FRAMING_MAX_WIRE_SIZE];
-    size_t  n = 0U;
-    TEST_ASSERT_EQUAL_INT(FWB_OK,
-        fwb_framing_encode(&cfg_zero, 0x05U, 7U,
-                           payload, sizeof(payload), wire, sizeof(wire), &n));
+    size_t n = 0U;
+    TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_encode(&cfg_zero, 0x05U, 7U, payload, sizeof(payload),
+                                                     wire, sizeof(wire), &n));
 
-    fwb_framing_rx_t    rx1, rx2;
-    fwb_framing_frame_t f1, f2;
-    bool r1 = false, r2 = false;
+    fwb_framing_rx_t rx1;
+    fwb_framing_rx_t rx2;
+    fwb_framing_frame_t f1;
+    fwb_framing_frame_t f2;
+    bool r1 = false;
+    bool r2 = false;
     TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_rx_init(&rx1, &cfg_zero, 0U));
     TEST_ASSERT_EQUAL_INT(FWB_OK, fwb_framing_rx_init(&rx2, &cfg_zero, 0U));
 

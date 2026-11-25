@@ -1,16 +1,15 @@
-#include "fwb/framing/framing.h"
-#include "framing_internal.h"
+#include <string.h>
 
 #include "fwb/common/endian.h"
 #include "fwb/crc/crc.h"
+#include "fwb/framing/framing.h"
 
-#include <string.h>
+#include "framing_internal.h"
 
 /* FRM-REQ-030 to 042: order of checks follows wire-format.md §7 exactly. */
 
-fwb_status_t fwb_framing_decode(const fwb_framing_cfg_t *cfg,
-                                const uint8_t *frame, size_t frame_len,
-                                fwb_framing_frame_t *out)
+fwb_status_t fwb_framing_decode(const fwb_framing_cfg_t *cfg, const uint8_t *frame,
+                                size_t frame_len, fwb_framing_frame_t *out)
 {
     if (cfg == NULL || frame == NULL || out == NULL) {
         return FWB_ERR_INVALID_ARG;
@@ -59,8 +58,8 @@ fwb_status_t fwb_framing_decode(const fwb_framing_cfg_t *cfg,
     }
 
     /* FRM-REQ-039: only write to out on success. */
-    out->type        = frame[2];
-    out->seq         = fwb_rd_u16_le(&frame[3]);
+    out->type = frame[2];
+    out->seq = fwb_rd_u16_le(&frame[3]);
     out->payload_len = len;
     if (len > 0U) {
         memcpy(out->payload, &frame[7], (size_t)len);
@@ -69,20 +68,17 @@ fwb_status_t fwb_framing_decode(const fwb_framing_cfg_t *cfg,
     return FWB_OK;
 }
 
-fwb_status_t fwb_framing_decode_wire(const fwb_framing_cfg_t *cfg,
-                                     const uint8_t *wire, size_t wire_len,
-                                     fwb_framing_frame_t *out)
+fwb_status_t fwb_framing_decode_wire(const fwb_framing_cfg_t *cfg, const uint8_t *wire,
+                                     size_t wire_len, fwb_framing_frame_t *out)
 {
     if (cfg == NULL || wire == NULL || out == NULL) {
         return FWB_ERR_INVALID_ARG;
     }
 
     uint8_t frame_buf[FWB_FRAMING_MAX_FRAME_SIZE];
-    size_t  frame_len = 0U;
+    size_t frame_len = 0U;
 
-    fwb_status_t st = framing_cobs_decode(wire, wire_len,
-                                          frame_buf, sizeof(frame_buf),
-                                          &frame_len);
+    fwb_status_t st = framing_cobs_decode(wire, wire_len, frame_buf, sizeof(frame_buf), &frame_len);
     if (st != FWB_OK) {
         return st;
     }

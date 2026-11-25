@@ -2,10 +2,15 @@
 #include <string.h>
 
 #include "fwb/antireplay/antireplay.h"
+
 #include "unity.h"
 
-void setUp(void)  {}
-void tearDown(void) {}
+void setUp(void)
+{
+}
+void tearDown(void)
+{
+}
 
 static fwb_antireplay_ctx_t make_seeded(uint16_t seed)
 {

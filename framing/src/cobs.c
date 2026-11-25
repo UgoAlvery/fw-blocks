@@ -1,11 +1,10 @@
-#include "framing_internal.h"
-
 #include <stdint.h>
+
+#include "framing_internal.h"
 
 /* FRM-REQ-060, 061, 062, 063, 064, 065, 066 */
 
-size_t framing_cobs_encode(const uint8_t *in, size_t in_len,
-                           uint8_t *out, size_t out_cap)
+size_t framing_cobs_encode(const uint8_t *in, size_t in_len, uint8_t *out, size_t out_cap)
 {
     /* Minimum output: 1 code byte even for empty input. */
     const size_t max_out = in_len + 1U + (in_len / 254U);
@@ -14,8 +13,8 @@ size_t framing_cobs_encode(const uint8_t *in, size_t in_len,
     }
 
     size_t code_pos = 0U;
-    size_t out_pos  = 1U;
-    uint8_t run     = 0U;
+    size_t out_pos = 1U;
+    uint8_t run = 0U;
 
     for (size_t i = 0U; i < in_len; i++) {
         if (in[i] != 0U) {
@@ -24,13 +23,13 @@ size_t framing_cobs_encode(const uint8_t *in, size_t in_len,
             if (run == 254U) {
                 /* Full block: code 0xFF, no implicit zero follows. */
                 out[code_pos] = 0xFFU;
-                code_pos      = out_pos;
+                code_pos = out_pos;
                 out[out_pos++] = 0U; /* placeholder for next code */
                 run = 0U;
             }
         } else {
-            out[code_pos]  = (uint8_t)(run + 1U);
-            code_pos       = out_pos;
+            out[code_pos] = (uint8_t)(run + 1U);
+            code_pos = out_pos;
             out[out_pos++] = 0U; /* placeholder for next code */
             run = 0U;
         }
@@ -40,11 +39,10 @@ size_t framing_cobs_encode(const uint8_t *in, size_t in_len,
     return out_pos;
 }
 
-fwb_status_t framing_cobs_decode(const uint8_t *in, size_t in_len,
-                                 uint8_t *out, size_t out_cap,
+fwb_status_t framing_cobs_decode(const uint8_t *in, size_t in_len, uint8_t *out, size_t out_cap,
                                  size_t *out_len)
 {
-    size_t pos     = 0U;
+    size_t pos = 0U;
     size_t out_pos = 0U;
 
     while (pos < in_len) {

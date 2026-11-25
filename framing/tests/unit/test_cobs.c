@@ -3,10 +3,15 @@
 #include <string.h>
 
 #include "fwb/framing/framing.h"
+
 #include "unity.h"
 
-void setUp(void)  {}
-void tearDown(void) {}
+void setUp(void)
+{
+}
+void tearDown(void)
+{
+}
 
 /* Helper: encode then decode, check round-trip. */
 static void check_roundtrip(const uint8_t *in, size_t in_len)
@@ -31,9 +36,7 @@ static void check_roundtrip(const uint8_t *in, size_t in_len)
         return; /* skip oversized */
     }
 
-    fwb_status_t st = fwb_framing_encode(&cfg, 0x42U, 0U,
-                                         in_len > 0U ? in : NULL,
-                                         (uint16_t)in_len,
+    fwb_status_t st = fwb_framing_encode(&cfg, 0x42U, 0U, in_len > 0U ? in : NULL, (uint16_t)in_len,
                                          wire, sizeof(wire), &n);
     TEST_ASSERT_EQUAL_INT(FWB_OK, st);
 
@@ -53,7 +56,7 @@ static void check_roundtrip(const uint8_t *in, size_t in_len)
 
     /* FRM-REQ-066: wire overhead <= 1 + floor(frame_len/254) + 1 (delimiter). */
     size_t frame_len = FWB_FRAMING_HEADER_SIZE + in_len + FWB_FRAMING_CRC_SIZE;
-    size_t max_wire  = frame_len + 1U + (frame_len / 254U) + 1U;
+    size_t max_wire = frame_len + 1U + (frame_len / 254U) + 1U;
     TEST_ASSERT_TRUE_MESSAGE(n <= max_wire, "COBS overhead exceeded");
 
     (void)decoded;
@@ -110,7 +113,7 @@ static void test_decode_wire_null_code(void)
     fwb_framing_cfg_t cfg = {0};
     fwb_framing_frame_t out;
     TEST_ASSERT_EQUAL_INT(FWB_ERR_COBS_MALFORMED,
-        fwb_framing_decode_wire(&cfg, bad_wire, sizeof(bad_wire), &out));
+                          fwb_framing_decode_wire(&cfg, bad_wire, sizeof(bad_wire), &out));
 }
 
 /* FRM-REQ-065: code pointing past end of buffer → COBS_MALFORMED */
@@ -121,7 +124,7 @@ static void test_decode_wire_code_overflow(void)
     fwb_framing_cfg_t cfg = {0};
     fwb_framing_frame_t out;
     TEST_ASSERT_EQUAL_INT(FWB_ERR_COBS_MALFORMED,
-        fwb_framing_decode_wire(&cfg, bad_wire, sizeof(bad_wire), &out));
+                          fwb_framing_decode_wire(&cfg, bad_wire, sizeof(bad_wire), &out));
 }
 
 /* FRM-REQ-066: COBS overhead check for max payload */

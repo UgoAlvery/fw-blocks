@@ -1,10 +1,15 @@
 #include <stdint.h>
 
 #include "fwb/antireplay/antireplay.h"
+
 #include "unity.h"
 
-void setUp(void)  {}
-void tearDown(void) {}
+void setUp(void)
+{
+}
+void tearDown(void)
+{
+}
 
 /* AR-REQ-030: 0xFFFF → 0x0000 treated as normal delta=+1. */
 static void test_wrap_ffff_to_0000(void)

@@ -2,10 +2,15 @@
 #include <string.h>
 
 #include "fwb/antireplay/antireplay.h"
+
 #include "unity.h"
 
-void setUp(void)  {}
-void tearDown(void) {}
+void setUp(void)
+{
+}
+void tearDown(void)
+{
+}
 
 /* AR-REQ-010 */
 static void test_init_not_seeded(void)

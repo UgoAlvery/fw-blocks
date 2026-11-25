@@ -7,9 +7,9 @@ _Static_assert(sizeof(fwb_antireplay_ctx_t) <= 16U, "AR-REQ-006: state > 16 byte
 /* Mask covering exactly FWB_ANTIREPLAY_WINDOW bits.
  * #if avoids (1ULL << 64) which is UB and confuses static analyzers. */
 #if FWB_ANTIREPLAY_WINDOW == 64U
-#define AR_WINDOW_MASK UINT64_MAX
+#    define AR_WINDOW_MASK UINT64_MAX
 #else
-#define AR_WINDOW_MASK (((uint64_t)1U << FWB_ANTIREPLAY_WINDOW) - 1U)
+#    define AR_WINDOW_MASK (((uint64_t)1U << FWB_ANTIREPLAY_WINDOW) - 1U)
 #endif
 
 fwb_status_t fwb_antireplay_init(fwb_antireplay_ctx_t *ctx)
@@ -43,8 +43,8 @@ fwb_status_t fwb_antireplay_check(fwb_antireplay_ctx_t *ctx, uint16_t seq)
     /* AR-REQ-011, 012: first value accepted unconditionally. */
     if (!ctx->seeded) {
         ctx->last_seq = seq;
-        ctx->mask     = 1U;
-        ctx->seeded   = true;
+        ctx->mask = 1U;
+        ctx->seeded = true;
         return FWB_OK;
     }
 

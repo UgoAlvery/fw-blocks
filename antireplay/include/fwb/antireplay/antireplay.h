@@ -12,21 +12,18 @@ extern "C" {
 
 /* AR-REQ-005: configurable to 8, 16, 32 or 64, default 64. */
 #ifndef FWB_ANTIREPLAY_WINDOW
-#define FWB_ANTIREPLAY_WINDOW 64U
+#    define FWB_ANTIREPLAY_WINDOW 64U
 #endif
 
-_Static_assert(
-    FWB_ANTIREPLAY_WINDOW == 8U  ||
-    FWB_ANTIREPLAY_WINDOW == 16U ||
-    FWB_ANTIREPLAY_WINDOW == 32U ||
-    FWB_ANTIREPLAY_WINDOW == 64U,
-    "FWB_ANTIREPLAY_WINDOW must be 8, 16, 32 or 64");
+_Static_assert(FWB_ANTIREPLAY_WINDOW == 8U || FWB_ANTIREPLAY_WINDOW == 16U ||
+                   FWB_ANTIREPLAY_WINDOW == 32U || FWB_ANTIREPLAY_WINDOW == 64U,
+               "FWB_ANTIREPLAY_WINDOW must be 8, 16, 32 or 64");
 
 /* AR-REQ-006: sizeof <= 16 for W=64 (verified by _Static_assert in .c). */
 typedef struct {
-    uint64_t mask;      /* bit i set → (last_seq - i) was accepted */
+    uint64_t mask; /* bit i set → (last_seq - i) was accepted */
     uint16_t last_seq;
-    bool     seeded;
+    bool seeded;
 } fwb_antireplay_ctx_t;
 
 /* AR-REQ-004: all public functions return FWB_ERR_INVALID_ARG on null ctx. */
