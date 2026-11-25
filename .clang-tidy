@@ -26,7 +26,8 @@ Checks: >
   -readability-avoid-const-params-in-decls,
   -misc-include-cleaner,
   -cert-dcl37-c,
-  -cert-dcl51-cpp
+  -cert-dcl51-cpp,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
 
 # Justification des exclusions :
 #
@@ -55,6 +56,10 @@ Checks: >
 #
 #   include-cleaner
 #       trop de faux positifs sur les en-tetes systeme en C.
+#
+#   clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+#       memcpy_s/memset_s/snprintf_s sont en Annex K de C11, absent de glibc
+#       et des toolchains bare-metal. Pas disponible sur les cibles de ce projet.
 #
 #   cert-dcl37-c / cert-dcl51-cpp
 #       signalent les identifiants reserves. Nos gardes d'inclusion
