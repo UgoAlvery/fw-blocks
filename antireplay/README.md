@@ -4,7 +4,7 @@ Contrôle de fraîcheur par fenêtre glissante sur un numéro de séquence de 16
 bits. Distingue une trame nouvelle, un doublon, une trame trop ancienne et un
 trou dans la séquence.
 
-**État : spécifié, non implémenté.**
+**État : implémenté et testé.** `check_docs.py --strict-tests --brick antireplay` passe à 100 %.
 
 ## Ce que la brique garantit
 
@@ -70,7 +70,7 @@ Conséquence : un attaquant qui a enregistré une trame légitime et qui provoqu
 ou attend un redémarrage du récepteur peut la rejouer avec succès. La fenêtre
 ne se referme qu'à partir de cette première trame.
 
-La brique signale explicitement ce premier état par `FWB_ANTIREPLAY_UNSEEDED`,
+La brique signale explicitement ce premier état via `fwb_antireplay_is_seeded()`,
 pour que l'application puisse décider : refuser toute trame jusqu'à un
 amorçage explicite, ou accepter le risque.
 
@@ -101,7 +101,7 @@ trame.
 ## Usage
 
 ```c
-static fwb_antireplay_t ar;
+static fwb_antireplay_ctx_t ar;
 fwb_antireplay_init(&ar);
 
 /* après qu'une trame a été validée par fwb_framing */
