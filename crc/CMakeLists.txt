@@ -23,5 +23,5 @@ fwb_add_brick_tests(BRICK crc
 )
 
 fwb_add_fuzzer(BRICK crc
-    # SOURCE fuzz/fuzz_crc.c
+    SOURCE fuzz/fuzz_crc.c
     CORPUS "${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus")

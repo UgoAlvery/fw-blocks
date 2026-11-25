@@ -10,12 +10,14 @@ maintenant qu'il faut s'en apercevoir, pas à la fin.
 | | Nombre |
 |---|---|
 | Exigences spécifiées | 111 |
-| Exigences implémentées | 27 |
-| Exigences vérifiées par un test qui passe | 19 |
+| Exigences implémentées | 111 |
+| Exigences vérifiées par un test qui passe | 89 |
 
-`fwb_crc` est implémenté (27/27 req). 19 vérifiées par TU/VEC passants, 6 par
-INSP, 2 attendent `fuzz_crc.c` (REQ-050, REQ-051). `fwb_common` implémenté,
-non tracé. `fwb_framing` et `fwb_antireplay` au stade spec.
+`fwb_crc`, `fwb_framing` et `fwb_antireplay` implémentés (111/111 req).
+89 vérifiées par TU/VEC/FI/FUZZ passants, 15 par INSP.
+7 en attente de campagne fuzzing (`fuzz_rx.c` : FRM-REQ-100/101/106 ;
+`fuzz_antireplay.c` : AR-REQ-032/040/041/042).
+`fwb_common` implémenté, non tracé.
 
 ## Règles de tenue
 

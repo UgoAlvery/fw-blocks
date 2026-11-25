@@ -14,12 +14,12 @@ matérielle, sans allocation dynamique et sans dépendance à une horloge.
 |---|---|---|---|
 | `common` | Codes d'erreur et types partagés | ✅ | ✅ |
 | `crc` | CRC paramétrable, modèle Rocksoft | ✅ | ✅ |
-| `framing` | Trames délimitées et contrôlées par CRC | ✅ | ⬜ |
-| `antireplay` | Fenêtre glissante sur numéro de séquence | ✅ | ⬜ |
+| `framing` | Trames délimitées et contrôlées par CRC | ✅ | ✅ |
+| `antireplay` | Fenêtre glissante sur numéro de séquence | ✅ | ✅ |
 
-`common` et `crc` sont implémentés et testés — 11/11 ctest sur debug, asan-ubsan
-et release. `framing` et `antireplay` sont au stade `v0.0-spec` : spécification
-figée, implémentation à venir. L'outillage est en place et la CI est verte.
+Toutes les briques sont implémentées et testées — 24/24 ctest sur debug et
+asan-ubsan. `check_docs.py --strict-tests` passe à 100 % sur les trois briques
+fonctionnelles.
 
 ## Ce que ce dépôt garantit
 

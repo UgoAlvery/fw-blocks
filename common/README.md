@@ -2,7 +2,7 @@
 
 Le strict minimum partagé par les autres briques. **Aucune logique.**
 
-**État : spécifié, non implémenté.**
+**État : implémenté, testé. Pas d'exigences propres : tous les codes d'erreur et helpers sont vérifiés par les briques qui les utilisent.**
 
 ## Contenu autorisé
 

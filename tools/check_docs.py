@@ -41,7 +41,7 @@ REQ_FILES = ("crc/docs/requirements.md",
 LINK = re.compile(r"\[[^\]]*\]\(([^)#]+?)\)")
 REQ_DEF = re.compile(r"^\|\s*((?:CRC|FRM|AR)-REQ-\d{3})\s*\|")
 REQ_ANY = re.compile(r"(?:CRC|FRM|AR)-REQ-\d{3}")
-REQ_ROW = re.compile(r"^\|\s*((?:CRC|FRM|AR)-REQ-\d{3})\s*\|[^|]*\|\s*([A-Z, ]+?)\s*\|")
+REQ_ROW = re.compile(r"^\|\s*((?:CRC|FRM|AR)-REQ-\d{3})\s*\|[^|]*\|[^|]*\|\s*([A-Z, ]+?)\s*\|")
 ADR_USE = re.compile(r"ADR-(\d{4})")
 CODE_USE = re.compile(r"FWB_(?:OK|ERR_[A-Z_]+)\b")
 CODE_DEF = re.compile(r"^(FWB_[A-Z_]+)\s+=", re.M)
