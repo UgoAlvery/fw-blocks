@@ -18,7 +18,9 @@ typedef struct {
 static bool ref_was_accepted(const ref_model_t *ref, uint16_t seq)
 {
     for (uint32_t i = 0U; i < ref->count && i < REF_SIZE; i++) {
-        if (ref->accepted[i] == seq) return true;
+        if (ref->accepted[i] == seq) {
+            return true;
+        }
     }
     return false;
 }
@@ -32,9 +34,15 @@ static void ref_record(ref_model_t *ref, uint16_t seq)
      * replays of values older than REF_SIZE, when to upgrade: increase REF_SIZE */
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming)
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
+
+// NOLINTNEXTLINE(readability-identifier-naming)
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (size < 2U) return 0;
+    if (size < 2U) {
+        return 0;
+    }
 
     static fwb_antireplay_ctx_t ctx;
     static ref_model_t ref;

@@ -5,9 +5,15 @@
 
 #include "fwb/framing/framing.h"
 
+// NOLINTNEXTLINE(readability-identifier-naming)
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
+
+// NOLINTNEXTLINE(readability-identifier-naming)
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (size == 0U) return 0;
+    if (size == 0U) {
+        return 0;
+    }
 
     /* Use first 2 bytes as link_id, rest as byte stream. */
     uint16_t link_id = 0U;
@@ -17,7 +23,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         size -= 2U;
     }
 
-    static fwb_framing_rx_t    rx;
+    static fwb_framing_rx_t rx;
     static fwb_framing_frame_t frame;
     fwb_framing_cfg_t cfg = {.link_id = link_id};
     (void)fwb_framing_rx_init(&rx, &cfg, 0U);
@@ -29,13 +35,14 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         /* FRM-REQ-102: a delivered frame must re-encode identically. */
         if (r) {
             uint8_t rewire[FWB_FRAMING_MAX_WIRE_SIZE];
-            size_t  n = 0U;
-            fwb_status_t enc_st = fwb_framing_encode(
-                &cfg, frame.type, frame.seq,
-                frame.payload_len > 0U ? frame.payload : NULL,
-                frame.payload_len, rewire, sizeof(rewire), &n);
+            size_t n = 0U;
+            fwb_status_t enc_st = fwb_framing_encode(&cfg, frame.type, frame.seq,
+                                                     frame.payload_len > 0U ? frame.payload : NULL,
+                                                     frame.payload_len, rewire, sizeof(rewire), &n);
             /* If encoding fails here something is deeply wrong. */
-            if (enc_st != FWB_OK) __builtin_trap();
+            if (enc_st != FWB_OK) {
+                __builtin_trap();
+            }
         }
         (void)st;
     }
