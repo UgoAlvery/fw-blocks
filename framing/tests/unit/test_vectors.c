@@ -213,8 +213,8 @@ static void test_all_vectors(void)
                         break;
                     }
                     char lo = *p++;
-                    char buf[3] = {hi, lo, '\0'};
                     if (v.wire_len < MAX_WIRE) {
+                        const char buf[3] = {hi, lo, '\0'};
                         v.wire[v.wire_len++] = (uint8_t)strtoul(buf, NULL, 16);
                     }
                 }
@@ -238,8 +238,8 @@ static void test_all_vectors(void)
                     break;
                 }
                 char lo = *p++;
-                char buf[3] = {hi, lo, '\0'};
                 if (v.wire_len < MAX_WIRE) {
+                    const char buf[3] = {hi, lo, '\0'};
                     v.wire[v.wire_len++] = (uint8_t)strtoul(buf, NULL, 16);
                 }
             }
