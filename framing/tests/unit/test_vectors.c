@@ -142,7 +142,7 @@ static void test_all_vectors(void)
 {
     FILE *f = fopen(FWB_VECTORS_PATH, "r");
     if (f == NULL) {
-        TEST_FAIL_MESSAGE("Cannot open vectors.txt: " FWB_VECTORS_PATH);
+        TEST_FAIL_MESSAGE("Cannot open vectors.txt (check FWB_VECTORS_PATH)");
         return;
     }
 

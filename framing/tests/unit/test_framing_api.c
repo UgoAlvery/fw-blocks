@@ -15,8 +15,8 @@ void tearDown(void)
 /* FRM-REQ-004 */
 static void test_constants_usable_in_array_decl(void)
 {
-    uint8_t wire_buf[FWB_FRAMING_MAX_WIRE_SIZE];
-    uint8_t frame_buf[FWB_FRAMING_MAX_FRAME_SIZE];
+    uint8_t wire_buf[FWB_FRAMING_MAX_WIRE_SIZE] = {0};
+    uint8_t frame_buf[FWB_FRAMING_MAX_FRAME_SIZE] = {0};
     (void)wire_buf;
     (void)frame_buf;
     TEST_ASSERT_EQUAL_UINT(268U, FWB_FRAMING_MAX_WIRE_SIZE);

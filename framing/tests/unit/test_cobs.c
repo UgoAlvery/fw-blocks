@@ -18,7 +18,7 @@ static void check_roundtrip(const uint8_t *in, size_t in_len)
 {
     /* Use decode_wire path via a fresh encode to exercise both sides. */
     static uint8_t wire[FWB_FRAMING_MAX_WIRE_SIZE];
-    static uint8_t decoded[FWB_FRAMING_MAX_FRAME_SIZE];
+    static uint8_t decoded[FWB_FRAMING_MAX_FRAME_SIZE] = {0};
 
     /* We test COBS directly via encode/decode_wire with a valid frame, but
      * for raw COBS we need the internal symbols. Access them indirectly:
