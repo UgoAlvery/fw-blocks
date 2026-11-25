@@ -4,7 +4,7 @@ Mise en trame pour liaison série : délimitation sans ambiguïté, contrôle
 d'intégrité par CRC, et récepteur en flux capable de se resynchroniser après
 une erreur.
 
-**État : spécifié, non implémenté.**
+**État : implémenté et testé.** `check_docs.py --strict-tests --brick framing` passe à 100 %.
 
 ## Ce que la brique garantit
 
